@@ -27,10 +27,10 @@ const ngcWebpack = require('ngc-webpack');
 /**
  * Webpack Constants
  */
+const AOT = false;
 const HMR = helpers.hasProcessFlag('hot');
-const AOT = process.env.BUILD_AOT || helpers.hasNpmFlag('aot');
 const METADATA = {
-  title: 'Angular2 Webpack Starter by @gdi2290 from @AngularClass',
+  title: 'Angular 2',
   baseUrl: '/',
   isDevServer: helpers.isWebpackDevServer(),
   HMR: HMR
@@ -63,8 +63,7 @@ module.exports = function (options) {
     entry: {
 
       'polyfills': './src/polyfills.browser.ts',
-      'main':      AOT ? './src/main.browser.aot.ts' :
-                  './src/main.browser.ts'
+      'main':      './src/main.browser.ts'
 
     },
 
@@ -129,7 +128,6 @@ module.exports = function (options) {
               options: {
                 loader: 'async-import',
                 genDir: 'compiled',
-                aot: AOT
               }
             },
             {
