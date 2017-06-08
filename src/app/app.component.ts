@@ -1,13 +1,16 @@
 import { Component } from '@angular/core';
 
-@Component({
-  selector: 'my-app',
-  template: `
-    <h1>{{title}}</h1>
-  `,
-  styles: [ ]
-})
+import { DummyService } from './shared';
 
+@Component({
+  selector: 'my-app', // <my-app></my-app>
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss'],
+})
 export class AppComponent {
-  title = 'My App';
+  title: string;
+
+  constructor(private dummy: DummyService) {
+    this.title = this.dummy.title;
+  }
 }

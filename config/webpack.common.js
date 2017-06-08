@@ -10,7 +10,7 @@ const helpers = require('./helpers');
  *
  * problem with copy-webpack-plugin
  */
-const AssetsPlugin = require('assets-webpack-plugin');
+// const AssetsPlugin = require('assets-webpack-plugin');
 const NormalModuleReplacementPlugin = require('webpack/lib/NormalModuleReplacementPlugin');
 const ContextReplacementPlugin = require('webpack/lib/ContextReplacementPlugin');
 const CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
@@ -21,7 +21,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const InlineManifestWebpackPlugin = require('inline-manifest-webpack-plugin');
 const LoaderOptionsPlugin = require('webpack/lib/LoaderOptionsPlugin');
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
-const ngcWebpack = require('ngc-webpack');
+// const ngcWebpack = require('ngc-webpack');
 //const PreloadWebpackPlugin = require('preload-webpack-plugin');
 
 /**
@@ -62,8 +62,9 @@ module.exports = function (options) {
      */
     entry: {
 
-      'polyfills': './src/polyfills.browser.ts',
-      'main':      './src/main.browser.ts'
+      'polyfills': './src/polyfills.ts',
+      'vendor': './src/vendor.ts',
+      'main': './src/main.ts'
 
     },
 
@@ -79,7 +80,7 @@ module.exports = function (options) {
        *
        * See: http://webpack.github.io/docs/configuration.html#resolve-extensions
        */
-      extensions: ['.ts', '.js', '.json'],
+      extensions: ['.ts', '.js', '.json', '.scss', '.css', '.html', '.less'],
 
       /**
        * An array of directory names to be resolved to the current directory
@@ -185,7 +186,7 @@ module.exports = function (options) {
         {
           test: /\.html$/,
           use: 'raw-loader',
-          exclude: [helpers.root('src/index.html')]
+          exclude: [helpers.root('src/public/index.html')]
         },
 
         /**
@@ -239,6 +240,9 @@ module.exports = function (options) {
         name: 'polyfills',
         chunks: ['polyfills']
       }),
+      new CopyWebpackPlugin([{
+        from: helpers.root('src/public')
+      }]),
       /**
        * This enables tree shaking of the vendor modules
        */
@@ -320,7 +324,7 @@ module.exports = function (options) {
       * See: https://github.com/ampedandwired/html-webpack-plugin
       */
       new HtmlWebpackPlugin({
-        template: 'src/index.html',
+        template: 'src/public/index.html',
         title: METADATA.title,
         chunksSortMode: 'dependency',
         metadata: METADATA,
@@ -360,40 +364,6 @@ module.exports = function (options) {
        */
       new LoaderOptionsPlugin({}),
 
-      new ngcWebpack.NgcWebpackPlugin({
-        /**
-         * If false the plugin is a ghost, it will not perform any action.
-         * This property can be used to trigger AOT on/off depending on your build target (prod, staging etc...)
-         *
-         * The state can not change after initializing the plugin.
-         * @default true
-         */
-        disabled: !AOT,
-        tsConfig: helpers.root('tsconfig.webpack.json'),
-        /**
-         * A path to a file (resource) that will replace all resource referenced in @Components.
-         * For each `@Component` the AOT compiler compiles it creates new representation for the templates (html, styles)
-         * of that `@Components`. It means that there is no need for the source templates, they take a lot of
-         * space and they will be replaced by the content of this resource.
-         *
-         * To leave the template as is set to a falsy value (the default).
-         *
-         * TIP: Use an empty file as an overriding resource. It is recommended to use a ".js" file which
-         * usually has small amount of loaders hence less performance impact.
-         *
-         * > This feature is doing NormalModuleReplacementPlugin for AOT compiled resources.
-         *
-         * ### resourceOverride and assets
-         * If you reference assets in your styles/html that are not inlined and you expect a loader (e.g. url-loader)
-         * to copy them, don't use the `resourceOverride` feature as it does not support this feature at the moment.
-         * With `resourceOverride` the end result is that webpack will replace the asset with an href to the public
-         * assets folder but it will not copy the files. This happens because the replacement is done in the AOT compilation
-         * phase but in the bundling it won't happen (it's being replaced with and empty file...)
-         *
-         * @default undefined
-         */
-        resourceOverride: helpers.root('config/resource-override.js')
-      }),
 
       /**
        * Plugin: InlineManifestWebpackPlugin
